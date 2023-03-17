@@ -4,7 +4,6 @@ import {
   getAllCats,
   getCat,
   updateCat,
-  getCatsByUser,
 } from '../models/catModel';
 import {Request, Response, NextFunction} from 'express';
 import {Cat, PostCat} from '../../interfaces/Cat';
