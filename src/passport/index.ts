@@ -22,7 +22,6 @@ passport.use(
   })
 );
 
-// TODO: JWT strategy for handling bearer token
 // consider .env for secret, e.g. secretOrKey: process.env.JWT_SECRET
 passport.use(
   new JWTStrategy(
