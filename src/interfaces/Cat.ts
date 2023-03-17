@@ -7,8 +7,8 @@ interface Cat {
 
 interface GetCat extends RowDataPacket, Cat {}
 
-// TODO: create PostCat interface. Same as cat but without id
+// TODO: create PostCat interface or type. Same as cat but without id
 
-// TODO: create PutCat interface. Sameas PostCat but properties are optional
+// TODO: create PutCat interface or type. Sameas PostCat but properties are optional
 
 export {Cat, GetCat};
