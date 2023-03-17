@@ -60,24 +60,26 @@ The tables are updated a little from 2nd year example.
 
 ```sql
 CREATE TABLE `sssf_cat` (
-  `cat_id` int(11) NOT NULL,
+  `cat_id` int(11) NOT NULL AUTO_INCREMENT,
   `cat_name` text NOT NULL,
   `weight` float NOT NULL,
   `owner` int(11) NOT NULL,
   `filename` text NOT NULL,
   `birthdate` date DEFAULT NULL,
   `coords` point NOT NULL
+  PRIMARY_KEY(cat_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 INSERT INTO `sssf_cat` (`cat_id`, `cat_name`, `weight`, `owner`, `filename`, `birthdate`, `coords`) VALUES
 (41, 'Siiri', 4, 37, 'some_filename', '2010-03-05', 0x00000000010100000064f188f709214e408d976e1283d83840);
 
 CREATE TABLE `sssf_user` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` text NOT NULL,
   `email` text NOT NULL,
   `password` text NOT NULL,
   `role` text NOT NULL DEFAULT 'user'
+  PRIMARY_KEY(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 INSERT INTO `sssf_user` (`user_id`, `user_name`, `email`, `password`, `role`) VALUES
