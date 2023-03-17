@@ -36,7 +36,6 @@ const errorHandler = (
 const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log(req.file?.path);
-    // TODO: Use node-exif to get longitude and latitude from imgFile
     // coordinates below should be an array of GPS coordinates in decimal format: [longitude, latitude]
     new ExifImage({image: req.file?.path}, (error, exifData) => {
       if (error) {
