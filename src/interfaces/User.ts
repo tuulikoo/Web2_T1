@@ -7,10 +7,10 @@ interface User {
   password: string;
 }
 
-// TODO: create interface GetUser that extends RowDataPacket and User
+// TODO: create interface or type GetUser that extends RowDataPacket and User
 
-// TODO create interface PostUser that extends User but without id
+// TODO create interface or type PostUser that extends User but without id
 
-// TODO create interface PutUser that extends PostUser but all properties are optional
+// TODO create interface or type PutUser that extends PostUser but all properties are optional
 
 export {User};
