@@ -51,6 +51,7 @@ User:
 The tables are updated a little from 2nd year example.
 
 - Role is "admin"/"user" instead of 0/1.
+  - When posting user, don't add role
 - Coordinates are saved as [POINT](https://mariadb.com/kb/en/geometry-types/#pointpoint) instead of stringified array
 - Passwords for both example users is 1234
 - _Do not change or delete admin user_
