@@ -55,7 +55,7 @@ The tables are updated a little from 2nd year example.
 - Passwords for both example users is 1234
 - _Do not change or delete admin user_
 
-### Run this SQL in your database:
+### Run this SQL in your database, make ids auto increment:
 
 ```sql
 CREATE TABLE `sssf_cat` (
