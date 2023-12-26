@@ -1,7 +1,9 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
-import {GetUser, PostUser, PutUser, User} from '../../interfaces/User';
+import {User} from '../../interfaces/User';
+
+interface GetUser extends RowDataPacket, User {}
 
 const getAllUsers = async (): Promise<User[]> => {
   const [rows] = await promisePool.execute<GetUser[]>(
@@ -33,7 +35,10 @@ const getUser = async (userId: string): Promise<User> => {
 
 // TODO: create addUser function
 
-const updateUser = async (data: PutUser, userId: number): Promise<boolean> => {
+const updateUser = async (
+  data: Partial<User>,
+  userId: number
+): Promise<boolean> => {
   const sql = promisePool.format('UPDATE sssf_user SET ? WHERE user_id = ?;', [
     data,
     userId,

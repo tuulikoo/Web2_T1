@@ -1,7 +1,9 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
-import {Cat, GetCat, PostCat, PutCat} from '../../interfaces/Cat';
+import {Cat} from '../../interfaces/Cat';
+
+interface GetCat extends RowDataPacket, Cat {}
 
 const getAllCats = async (): Promise<Cat[]> => {
   const [rows] = await promisePool.execute<GetCat[]>(
@@ -26,7 +28,8 @@ const getAllCats = async (): Promise<Cat[]> => {
 
 // TODO: create getCat function to get single cat
 
-const addCat = async (data: PostCat): Promise<number> => {
+// TODO: use Utility type to add type to data
+const addCat = async (data): Promise<number> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
