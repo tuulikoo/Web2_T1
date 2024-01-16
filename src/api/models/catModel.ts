@@ -1,12 +1,11 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
-import {Cat} from '../../interfaces/Cat';
-
-interface GetCat extends RowDataPacket, Cat {}
+import {Cat} from '../../types/DBTypes';
+import {MessageResponse} from '../../types/MessageTypes';
 
 const getAllCats = async (): Promise<Cat[]> => {
-  const [rows] = await promisePool.execute<GetCat[]>(
+  const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
     `
     SELECT cat_id, cat_name, weight, filename, birthdate, ST_X(coords) as lat, ST_Y(coords) as lng,
     JSON_OBJECT('user_id', sssf_user.user_id, 'user_name', sssf_user.user_name) AS owner 
@@ -28,8 +27,8 @@ const getAllCats = async (): Promise<Cat[]> => {
 
 // TODO: create getCat function to get single cat
 
-// TODO: use Utility type to add type to data
-const addCat = async (data): Promise<number> => {
+// TODO: use Utility type to modify Cat type for 'data'
+const addCat = async (data): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
@@ -48,8 +47,7 @@ const addCat = async (data): Promise<number> => {
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats added', 400);
   }
-  console.log(headers.info);
-  return headers.insertId;
+  return {message: 'Cat added'};
 };
 
 // TODO: create updateCat function to update single cat

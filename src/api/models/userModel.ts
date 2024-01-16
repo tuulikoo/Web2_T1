@@ -1,12 +1,11 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
-import {User} from '../../interfaces/User';
-
-interface GetUser extends RowDataPacket, User {}
+import {User} from '../../types/DBTypes';
+import {MessageResponse} from '../../types/MessageTypes';
 
 const getAllUsers = async (): Promise<User[]> => {
-  const [rows] = await promisePool.execute<GetUser[]>(
+  const [rows] = await promisePool.execute<RowDataPacket[] & User[]>(
     `
     SELECT user_id, user_name, email, role 
     FROM sssf_user
@@ -19,7 +18,7 @@ const getAllUsers = async (): Promise<User[]> => {
 };
 
 const getUser = async (userId: string): Promise<User> => {
-  const [rows] = await promisePool.execute<GetUser[]>(
+  const [rows] = await promisePool.execute<RowDataPacket[] & User[]>(
     `
     SELECT user_id, user_name, email, role 
     FROM sssf_user 
@@ -38,7 +37,7 @@ const getUser = async (userId: string): Promise<User> => {
 const updateUser = async (
   data: Partial<User>,
   userId: number
-): Promise<boolean> => {
+): Promise<MessageResponse> => {
   const sql = promisePool.format('UPDATE sssf_user SET ? WHERE user_id = ?;', [
     data,
     userId,
@@ -47,13 +46,13 @@ const updateUser = async (
   if (headers.affectedRows === 0) {
     throw new CustomError('No users updated', 400);
   }
-  return true;
+  return {message: 'User updated'};
 };
 
 // TODO: create deleteUser function
 
 const getUserLogin = async (email: string): Promise<User> => {
-  const [rows] = await promisePool.execute<GetUser[]>(
+  const [rows] = await promisePool.execute<RowDataPacket[] & User[]>(
     `
     SELECT * FROM sssf_user 
     WHERE email = ?;

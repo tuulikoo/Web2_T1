@@ -6,13 +6,17 @@ import {
   updateCat,
 } from '../models/catModel';
 import {Request, Response, NextFunction} from 'express';
-import {Cat, PostCat} from '../../interfaces/Cat';
-import {User} from '../../interfaces/User';
 import CustomError from '../../classes/CustomError';
 import {validationResult} from 'express-validator';
+import {TypedResponse} from '../../types/MessageTypes';
+import {Cat, User} from '../../types/DBTypes';
 import MessageResponse from '../../interfaces/MessageResponse';
 
-const catListGet = async (req: Request, res: Response, next: NextFunction) => {
+const catListGet = async (
+  _req: Request,
+  res: TypedResponse<Cat[]>,
+  next: NextFunction
+) => {
   try {
     const cats = await getAllCats();
     res.json(cats);
@@ -21,7 +25,11 @@ const catListGet = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const catGet = async (req: Request, res: Response, next: NextFunction) => {
+const catGet = async (
+  req: Request,
+  res: TypedResponse<Cat>,
+  next: NextFunction
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -50,7 +58,7 @@ const catGet = async (req: Request, res: Response, next: NextFunction) => {
 
 const catPut = async (
   req: Request<{id: string}, {}, Cat>,
-  res: Response,
+  res: TypedResponse<MessageResponse>,
   next: NextFunction
 ) => {
   const errors = validationResult(req);
@@ -65,7 +73,7 @@ const catPut = async (
   }
 
   try {
-    const id = parseInt(req.params.id);
+    const id = Number(req.params.id);
     const cat = req.body;
     const result = await updateCat(
       cat,
@@ -73,13 +81,7 @@ const catPut = async (
       (req.user as User).user_id,
       (req.user as User).role
     );
-    if (result) {
-      const message: MessageResponse = {
-        message: 'cat updated',
-        id,
-      };
-      res.json(message);
-    }
+    res.json(result);
   } catch (error) {
     next(error);
   }

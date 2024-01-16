@@ -1,12 +1,12 @@
 import request from 'supertest';
 import expect from 'expect';
-import {User} from '../src/interfaces/User';
-import ErrorResponse from '../src/interfaces/ErrorResponse';
+import {User} from '../src/types/DBTypes';
+import {ErrorResponse, MessageResponse} from '../src/types/MessageTypes';
 
-interface UserWithToken {
+type UserWithToken = {
   user: User;
   token: string;
-}
+};
 
 const getUser = (url: string | Function): Promise<User[]> => {
   return new Promise((resolve, reject) => {
@@ -22,6 +22,7 @@ const getUser = (url: string | Function): Promise<User[]> => {
             expect(user).toHaveProperty('user_name');
             expect(user).toHaveProperty('email');
             expect(user).toHaveProperty('role');
+            expect(user).not.toHaveProperty('password');
           });
           resolve(users);
         }
@@ -37,11 +38,12 @@ const getSingleUser = (url: string | Function, id: number): Promise<User> => {
         if (err) {
           reject(err);
         } else {
-          const user = response.body;
+          const user: User = response.body;
           expect(user).toHaveProperty('user_id');
           expect(user).toHaveProperty('user_name');
           expect(user).toHaveProperty('email');
           expect(user).toHaveProperty('role');
+          expect(user).not.toHaveProperty('password');
           resolve(response.body);
         }
       });
@@ -51,7 +53,7 @@ const getSingleUser = (url: string | Function, id: number): Promise<User> => {
 const postUser = (
   url: string | Function,
   user: Omit<User, 'user_id' | 'role'>
-): Promise<UserWithToken> => {
+): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
       .post('/api/v1/user/')
@@ -62,15 +64,18 @@ const postUser = (
         if (err) {
           reject(err);
         } else {
-          expect(response.body).toHaveProperty('message');
-          expect(response.body).toHaveProperty('user_id');
-          resolve(response.body);
+          const resp: MessageResponse = response.body;
+          expect(resp).toHaveProperty('message');
+          resolve(resp);
         }
       });
   });
 };
 
-const putUser = (url: string | Function, token: string) => {
+const putUser = (
+  url: string | Function,
+  token: string
+): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
       .put('/api/v1/user/')
@@ -80,11 +85,13 @@ const putUser = (url: string | Function, token: string) => {
         user_name: 'Test User ' + new Date().toISOString(),
       })
       .expect('Content-Type', /json/)
-      .expect(200, {message: 'user modified'}, (err, response) => {
+      .expect(200, (err, response) => {
         if (err) {
           reject(err);
         } else {
-          resolve(response.body);
+          const resp: MessageResponse = response.body;
+          expect(resp.message).toBe('user modified');
+          resolve(resp);
         }
       });
   });
@@ -107,6 +114,7 @@ const getCurrentUser = (
           expect(user).toHaveProperty('user_name');
           expect(user).toHaveProperty('email');
           expect(user).toHaveProperty('role');
+          expect(user).not.toHaveProperty('password');
           resolve(response.body);
         }
       });
@@ -132,6 +140,7 @@ const postAuthLogin = (
           expect(user).toHaveProperty('email');
           expect(user).toHaveProperty('role');
           expect(user).toHaveProperty('user_id');
+          expect(user).not.toHaveProperty('password');
           resolve(response.body);
         }
       });
@@ -161,16 +170,18 @@ const postAuthLoginError = (url: string | Function): Promise<ErrorResponse> => {
 const deleteUser = (
   url: string | Function,
   token: string
-): Promise<ErrorResponse> => {
+): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
       .delete('/api/v1/user')
       .set('Authorization', 'Bearer ' + token)
-      .expect(200, {message: 'user deleted'}, (err, response) => {
+      .expect(200, (err, response) => {
         if (err) {
           reject(err);
         } else {
-          resolve(response.body);
+          const resp: MessageResponse = response.body;
+          expect(resp.message).toBe('user deleted');
+          resolve(resp);
         }
       });
   });

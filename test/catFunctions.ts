@@ -1,8 +1,7 @@
 import request from 'supertest';
 import expect from 'expect';
-import {User} from '../src/interfaces/User';
-import {Cat} from '../src/interfaces/Cat';
-import MessageResponse from '../src/interfaces/MessageResponse';
+import {User, Cat} from '../src/types/DBTypes';
+import {MessageResponse} from '../src/types/MessageTypes';
 
 interface UserWithToken {
   user: User;
@@ -72,7 +71,6 @@ const postCat = (
           reject(err);
         } else {
           const cat: MessageResponse = response.body;
-          expect(cat.id).toBeGreaterThan(0);
           expect(cat.message).not.toBe('');
           resolve(response.body);
         }
@@ -99,7 +97,6 @@ const adminPutCat = (
           reject(err);
         } else {
           const cat: MessageResponse = response.body;
-          expect(cat.id).toBeGreaterThan(0);
           expect(cat.message).not.toBe('');
           resolve(cat);
         }
@@ -126,7 +123,6 @@ const userPutCat = (
           reject(err);
         } else {
           const cat: MessageResponse = response.body;
-          expect(cat.id).toBeGreaterThan(0);
           expect(cat.message).not.toBe('');
           resolve(cat);
         }
@@ -150,7 +146,6 @@ const adminDeleteCat = (
           reject(err);
         } else {
           const cat: MessageResponse = response.body;
-          expect(cat.id).toBeGreaterThan(0);
           expect(cat.message).not.toBe('');
           resolve(cat);
         }
@@ -174,7 +169,6 @@ const userDeleteCat = (
           reject(err);
         } else {
           const cat: MessageResponse = response.body;
-          expect(cat.id).toBeGreaterThan(0);
           expect(cat.message).not.toBe('');
           resolve(cat);
         }

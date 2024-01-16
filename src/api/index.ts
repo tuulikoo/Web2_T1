@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.use(passport.initialize());
 
-router.get<{}, MessageResponse>('/', (req, res) => {
+router.get('/', (_req: Request, res: TypedResponse<MessageResponse>) => {
   res.json({
     message: 'routes: auth, user, cat',
   });
