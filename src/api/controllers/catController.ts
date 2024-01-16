@@ -41,7 +41,8 @@ const catGet = async (
   }
 
   try {
-    const cat = await getCat(req.params.id);
+    const id = Number(req.params.id);
+    const cat = await getCat(id);
     res.json(cat);
   } catch (error) {
     next(error);
