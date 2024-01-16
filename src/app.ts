@@ -15,7 +15,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (_req: Request, res: TypedResponse<MessageResponse>) => {
+router.get<{}, MessageResponse>('/', (_req, res) => {
   res.json({
     message: 'API location: api/v1',
   });
