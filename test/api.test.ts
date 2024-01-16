@@ -9,7 +9,6 @@ import {
   postUser,
   putUser,
 } from './userFunctions';
-import {User} from '../src/interfaces/User';
 import {closePool} from '../src/database/db';
 import {getNotFound} from './testFunctions';
 import {
@@ -20,11 +19,12 @@ import {
   userDeleteCat,
   userPutCat,
 } from './catFunctions';
+import {User} from '../src/types/DBTypes';
 
-interface UserWithToken {
+type UserWithToken = {
   user: User;
   token: string;
-}
+};
 
 describe('GET /api/v1', () => {
   afterAll(async () => {

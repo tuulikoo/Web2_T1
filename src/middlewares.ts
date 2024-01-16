@@ -2,7 +2,7 @@
 import {NextFunction, Request, Response} from 'express';
 import sharp from 'sharp';
 import {ExifImage} from 'exif';
-import ErrorResponse from './interfaces/ErrorResponse';
+import {ErrorResponse} from './types/MessageTypes';
 import CustomError from './classes/CustomError';
 // import chalk from 'chalk';
 

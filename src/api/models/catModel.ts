@@ -54,7 +54,7 @@ const addCat = async (data): Promise<MessageResponse> => {
 // if role is admin, update any cat
 // if role is user, update only cats owned by user
 
-const deleteCat = async (catId: number): Promise<boolean> => {
+const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     DELETE FROM sssf_cat 
@@ -65,7 +65,7 @@ const deleteCat = async (catId: number): Promise<boolean> => {
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats deleted', 400);
   }
-  return true;
+  return {message: 'Cat deleted'};
 };
 
 export {getAllCats, getCat, addCat, updateCat, deleteCat};
