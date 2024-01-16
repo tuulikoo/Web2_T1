@@ -8,9 +8,8 @@ import {
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import {validationResult} from 'express-validator';
-import {TypedResponse} from '../../types/MessageTypes';
+import {TypedResponse, MessageResponse} from '../../types/MessageTypes';
 import {Cat, User} from '../../types/DBTypes';
-import MessageResponse from '../../interfaces/MessageResponse';
 
 const catListGet = async (
   _req: Request,
