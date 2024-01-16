@@ -8,12 +8,12 @@ import {
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import {validationResult} from 'express-validator';
-import {TypedResponse, MessageResponse} from '../../types/MessageTypes';
+import {MessageResponse} from '../../types/MessageTypes';
 import {Cat, User} from '../../types/DBTypes';
 
 const catListGet = async (
   _req: Request,
-  res: TypedResponse<Cat[]>,
+  res: Response<Cat[]>,
   next: NextFunction
 ) => {
   try {
@@ -24,11 +24,7 @@ const catListGet = async (
   }
 };
 
-const catGet = async (
-  req: Request,
-  res: TypedResponse<Cat>,
-  next: NextFunction
-) => {
+const catGet = async (req: Request, res: Response<Cat>, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -57,8 +53,8 @@ const catGet = async (
 // catPost should use req.user to get user_id and role
 
 const catPut = async (
-  req: Request<{id: string}, {}, Cat>,
-  res: TypedResponse<MessageResponse>,
+  req: Request<{id: string}, User, Cat>,
+  res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   const errors = validationResult(req);
@@ -75,12 +71,7 @@ const catPut = async (
   try {
     const id = Number(req.params.id);
     const cat = req.body;
-    const result = await updateCat(
-      cat,
-      id,
-      (req.user as User).user_id,
-      (req.user as User).role
-    );
+    const result = await updateCat(cat, id, req.user.user_id, req.user.role);
     res.json(result);
   } catch (error) {
     next(error);

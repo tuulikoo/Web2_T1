@@ -8,10 +8,15 @@ import {
 import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
-import {User} from '../../interfaces/User';
+import {User} from '../../types/DBTypes';
+import {MessageResponse, TypedResponse} from '../../types/MessageTypes';
 const salt = bcrypt.genSaltSync(12);
 
-const userListGet = async (req: Request, res: Response, next: NextFunction) => {
+const userListGet = async (
+  _req: Request,
+  res: Response<User[]>,
+  next: NextFunction
+) => {
   try {
     const users = await getAllUsers();
     res.json(users);
@@ -22,7 +27,7 @@ const userListGet = async (req: Request, res: Response, next: NextFunction) => {
 
 const userGet = async (
   req: Request<{id: string}, {}, {}>,
-  res: Response,
+  res: Response<User>,
   next: NextFunction
 ) => {
   try {
@@ -40,7 +45,7 @@ const userGet = async (
 
 const userPut = async (
   req: Request<{id: number}, {}, User>,
-  res: Response,
+  res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   try {
@@ -51,11 +56,8 @@ const userPut = async (
     const user = req.body;
 
     const result = await updateUser(user, req.params.id);
-    if (result) {
-      res.json({
-        message: 'user modified',
-      });
-    }
+
+    res.json(result);
   } catch (error) {
     next(error);
   }
@@ -72,16 +74,13 @@ const userPut = async (
 
 const userDeleteCurrent = async (
   req: Request,
-  res: Response,
+  res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   try {
     const result = await deleteUser((req.user as User).user_id);
-    if (result) {
-      res.json({
-        message: 'user deleted',
-      });
-    }
+
+    res.json(result);
   } catch (error) {
     next(error);
   }
