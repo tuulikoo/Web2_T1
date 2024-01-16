@@ -17,7 +17,7 @@ const getAllCats = async (): Promise<Cat[]> => {
   if (rows.length === 0) {
     throw new CustomError('No cats found', 404);
   }
-  const cats: Cat[] = rows.map((row) => ({
+  const cats = (rows as Cat[]).map((row) => ({
     ...row,
     owner: JSON.parse(row.owner?.toString() || '{}'),
   }));
