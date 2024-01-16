@@ -21,11 +21,6 @@ import {
 } from './catFunctions';
 import {User} from '../src/types/DBTypes';
 
-type UserWithToken = {
-  user: User;
-  token: string;
-};
-
 describe('GET /api/v1', () => {
   afterAll(async () => {
     // close database connection
@@ -43,10 +38,9 @@ describe('GET /api/v1', () => {
   });
 
   // test create user
-  let token: string = '';
-  let user: UserWithToken;
+  let token = '';
   it('should create a new user', async () => {
-    user = await postUser(app, {
+    await postUser(app, {
       user_name: 'Test User ' + new Date().toLocaleDateString('fi-FI'),
       email: 'test@user.fi',
       password: 'asdfQEWR1234',

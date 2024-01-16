@@ -2,7 +2,7 @@ import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import {Cat} from '../../types/DBTypes';
-import {MessageResponse} from '../../types/MessageTypes';
+import {MessageResponse, UploadResponse} from '../../types/MessageTypes';
 
 const getAllCats = async (): Promise<Cat[]> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
@@ -27,7 +27,8 @@ const getAllCats = async (): Promise<Cat[]> => {
 
 // TODO: create getCat function to get single cat
 
-// TODO: use Utility type to modify Cat type for 'data'
+// TODO: use Utility type to modify Cat type for 'data'.
+// Note that owner is not User in this case. It's just a number (user_id)
 const addCat = async (data): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
@@ -53,6 +54,7 @@ const addCat = async (data): Promise<MessageResponse> => {
 // TODO: create updateCat function to update single cat
 // if role is admin, update any cat
 // if role is user, update only cats owned by user
+// You can use updateUser function from userModel as a reference for SQL
 
 const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(

@@ -9,7 +9,8 @@ import {Request, Response, NextFunction} from 'express';
 import CustomError from '../../classes/CustomError';
 import bcrypt from 'bcryptjs';
 import {User} from '../../types/DBTypes';
-import {MessageResponse, TypedResponse} from '../../types/MessageTypes';
+import {MessageResponse} from '../../types/MessageTypes';
+import {validationResult} from 'express-validator';
 const salt = bcrypt.genSaltSync(12);
 
 const userListGet = async (
@@ -31,7 +32,8 @@ const userGet = async (
   next: NextFunction
 ) => {
   try {
-    const user = await getUser(req.params.id);
+    const id = Number(req.params.id);
+    const user = await getUser(id);
     res.json(user);
   } catch (error) {
     next(error);
@@ -41,6 +43,9 @@ const userGet = async (
 // TDOD: create userPost function to add new user
 // userPost should use addUser function from userModel
 // userPost should use validationResult to validate req.body
+// - user_name should be at least 3 characters long
+// - email should be a valid email
+// - password should be at least 5 characters long
 // userPost should use bcrypt to hash password
 
 const userPut = async (
@@ -48,8 +53,19 @@ const userPut = async (
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('cat_post validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
   try {
-    if ((req.user as User).role !== 'admin') {
+    if (req.user && req.user.role !== 'admin') {
       throw new CustomError('Admin only', 403);
     }
 
@@ -77,8 +93,21 @@ const userDeleteCurrent = async (
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('cat_post validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
   try {
-    const result = await deleteUser((req.user as User).user_id);
+    if (!req.user?.user_id) {
+      throw new CustomError('No user', 400);
+    }
+    const result = await deleteUser(req.user.user_id);
 
     res.json(result);
   } catch (error) {

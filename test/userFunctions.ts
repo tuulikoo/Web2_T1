@@ -1,5 +1,5 @@
+/* eslint-disable node/no-unpublished-import */
 import request from 'supertest';
-import expect from 'expect';
 import {User} from '../src/types/DBTypes';
 import {ErrorResponse, MessageResponse} from '../src/types/MessageTypes';
 
@@ -11,7 +11,7 @@ type UserWithToken = {
 const getUser = (url: string | Function): Promise<User[]> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .get('/api/v1/user')
+      .get('/api/v1/users')
       .expect(200, (err, response) => {
         if (err) {
           reject(err);
@@ -33,7 +33,7 @@ const getUser = (url: string | Function): Promise<User[]> => {
 const getSingleUser = (url: string | Function, id: number): Promise<User> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .get('/api/v1/user/' + id)
+      .get('/api/v1/users/' + id)
       .expect(200, (err, response) => {
         if (err) {
           reject(err);
@@ -56,7 +56,7 @@ const postUser = (
 ): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .post('/api/v1/user/')
+      .post('/api/v1/users/')
       .set('Content-type', 'application/json')
       .send(user)
       .expect('Content-Type', /json/)
@@ -65,7 +65,7 @@ const postUser = (
           reject(err);
         } else {
           const resp: MessageResponse = response.body;
-          expect(resp).toHaveProperty('message');
+          expect(resp.message).toBe('User added');
           resolve(resp);
         }
       });
@@ -78,7 +78,7 @@ const putUser = (
 ): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .put('/api/v1/user/')
+      .put('/api/v1/users/')
       .set('Content-type', 'application/json')
       .set('Authorization', 'Bearer ' + token)
       .send({
@@ -90,7 +90,7 @@ const putUser = (
           reject(err);
         } else {
           const resp: MessageResponse = response.body;
-          expect(resp.message).toBe('user modified');
+          expect(resp.message).toBe('User updated');
           resolve(resp);
         }
       });
@@ -103,7 +103,7 @@ const getCurrentUser = (
 ): Promise<User> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .get('/api/v1/user/token')
+      .get('/api/v1/users/token')
       .set('Authorization', 'Bearer ' + token)
       .expect(200, (err, response) => {
         if (err) {
@@ -173,14 +173,14 @@ const deleteUser = (
 ): Promise<MessageResponse> => {
   return new Promise((resolve, reject) => {
     request(url)
-      .delete('/api/v1/user')
+      .delete('/api/v1/users')
       .set('Authorization', 'Bearer ' + token)
       .expect(200, (err, response) => {
         if (err) {
           reject(err);
         } else {
           const resp: MessageResponse = response.body;
-          expect(resp.message).toBe('user deleted');
+          expect(resp.message).toBe('User deleted');
           resolve(resp);
         }
       });

@@ -46,14 +46,20 @@ const catGet = async (req: Request, res: Response<Cat>, next: NextFunction) => {
 };
 
 // TODO: create catPost function to add new cat
-// catPost should use addCat function from catModel
-// catPost should use validationResult to validate req.body
-// catPost should use req.file to get filename
-// catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
-// catPost should use req.user to get user_id and role
+const catPost = async (
+  req: Request<{}, {}, Omit<Cat, 'owner'> & {owner: number}>,
+  res: Response<MessageResponse, {coords: [number, number]}>,
+  next: NextFunction
+) => {
+  // catPost should use addCat function from catModel
+  // catPost should use validationResult to validate req.body
+  // catPost should use req.file to get filename
+  // catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
+  // catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
+};
 
 const catPut = async (
-  req: Request<{id: string}, User, Cat>,
+  req: Request<{id: string}, {}, Cat>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
