@@ -6,11 +6,19 @@ type User = {
   password: string;
 };
 
-type Cat = {
-  // TODO: create a cat type
-  // owner should be a User or a number
+type Point = {
+  x: number;
+  y: number;
 };
 
-export {Cat};
+type Cat = {
+  cat_id: number;
+  cat_name: string;
+  weight: number;
+  owner: User | number; // owner should be a User or a number
+  filename: string;
+  birthdate: string | null; // Assuming birthdate can be null as per the database schema
+  coords: Point;
+};
 
-export {User};
+export {User, Cat};
