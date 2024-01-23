@@ -44,7 +44,7 @@ const catGet = async (req: Request, res: Response<Cat>, next: NextFunction) => {
     next(error);
   }
 };
-
+// TODO: create catPost function to add new cat
 const catPost = async (
   req: Request<{}, {}, Omit<Cat, 'owner'> & {owner: number; filename: string}>,
   res: Response<MessageResponse, {coords: [number, number]}>,
@@ -116,6 +116,10 @@ const catPut = async (
     next(error);
   }
 };
+
+// TODO: create catDelete function to delete cat
+// catDelete should use deleteCat function from catModel
+// catDelete should use validationResult to validate req.params.id
 
 const catDelete = async (
   req: Request<{id: string}>,

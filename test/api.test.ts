@@ -100,6 +100,7 @@ describe('GET /api/v1', () => {
   });
 
   // test get single cat
+
   it('should return single cat', async () => {
     await getSingleCat(app, catID);
   });

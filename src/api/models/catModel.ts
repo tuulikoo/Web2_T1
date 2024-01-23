@@ -9,8 +9,8 @@ const getAllCats = async (): Promise<Cat[]> => {
     `
     SELECT cat_id, cat_name, weight, filename, birthdate, ST_X(coords) as lat, ST_Y(coords) as lng,
     JSON_OBJECT('user_id', sssf_user.user_id, 'user_name', sssf_user.user_name) AS owner 
-    FROM sssf_cat 
-    JOIN sssf_user 
+	  FROM sssf_cat 
+	  JOIN sssf_user 
     ON sssf_cat.owner = sssf_user.user_id
     `
   );
@@ -24,7 +24,10 @@ const getAllCats = async (): Promise<Cat[]> => {
 
   return cats;
 };
+// TODO: create getCat function to get single cat
 
+// TODO: use Utility type to modify Cat type for 'data'.
+// Note that owner is not User in this case. It's just a number (user_id)
 const getCat = async (catId: number): Promise<Cat> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
     `
@@ -47,10 +50,6 @@ const getCat = async (catId: number): Promise<Cat> => {
 
   return cat;
 };
-// TODO: create updateCat function to update single cat
-// if role is admin, update any cat
-// if role is user, update only cats owned by user
-// You can use updateUser function from userModel as a reference for SQL
 
 type UpdateCatData = Partial<Omit<Cat, 'cat_id'>> & {owner?: number};
 
@@ -73,7 +72,7 @@ const updateCat = async (
   if (userRole === 'user') {
     // Ensure the user can only update cats they own
     updateSql += ' AND owner = ?';
-    updateValues.push(user_id); // Assuming user_id is the ID of the current user
+    updateValues.push(user_id);
   }
 
   const sql = promisePool.format(updateSql, updateValues);

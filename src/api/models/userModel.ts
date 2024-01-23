@@ -40,7 +40,7 @@ const addUser = async (user: User): Promise<MessageResponse> => {
   }
   return {message: 'User added'};
 };
-
+// TODO: create addUser function
 const updateUser = async (
   data: Partial<User>,
   userId: number
@@ -55,13 +55,16 @@ const updateUser = async (
   }
   return {message: 'User updated'};
 };
+// TODO: create deleteUser function
 
 const deleteUser = async (userId: number): Promise<MessageResponse> => {
-  const sql = promisePool.format(
-    'DELETE FROM sssf_user WHERE user_id = ?',
-    userId
+  const [headers] = await promisePool.execute<ResultSetHeader>(
+    `
+    DELETE FROM sssf_user 
+    WHERE user_id = ?;
+    `,
+    [userId]
   );
-  const [headers] = await promisePool.execute<ResultSetHeader>(sql);
   if (headers.affectedRows === 0) {
     throw new CustomError('No users deleted', 400);
   }
