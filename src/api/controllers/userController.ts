@@ -94,7 +94,7 @@ const userPost = async (
     next(error);
   }
 };
-
+//userPut oli valmiina))
 const userPut = async (
   req: Request<{id: number}, {}, User>,
   res: Response<MessageResponse>,
