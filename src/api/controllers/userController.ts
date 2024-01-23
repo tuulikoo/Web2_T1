@@ -63,11 +63,11 @@ const userPost = async (
     const hashedPassword = bcrypt.hashSync(password, salt);
 
     const newUser: User = {
-      user_id: 0, // Auto-incremented in the database
+      user_id: 0,
       user_name,
       email,
       password: hashedPassword,
-      role: 'user', // Assuming a default role for new users
+      role: 'user',
     };
 
     const result = await addUser(newUser);
