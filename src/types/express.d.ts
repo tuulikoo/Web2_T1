@@ -9,4 +9,3 @@ declare global {
     interface User extends Partial<UserType> {}
   }
 }
-

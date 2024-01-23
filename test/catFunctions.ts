@@ -111,7 +111,7 @@ const userPutCat = (
       .set('Content-type', 'application/json')
       .set('Authorization', 'Bearer ' + token)
       .send({
-        cat_name: 'Test Cat100 ' + new Date().toISOString(),
+        cat_name: 'Test Cat ' + new Date().toISOString(),
       })
       .expect(200, (err, response) => {
         if (err) {
