@@ -57,9 +57,10 @@ const updateUser = async (
 };
 
 const deleteUser = async (userId: number): Promise<MessageResponse> => {
-  const sql = promisePool.format('DELETE FROM sssf_user WHERE user_id = ?', [
-    userId,
-  ]);
+  const sql = promisePool.format(
+    'DELETE FROM sssf_user WHERE user_id = ?',
+    userId
+  );
   const [headers] = await promisePool.execute<ResultSetHeader>(sql);
   if (headers.affectedRows === 0) {
     throw new CustomError('No users deleted', 400);

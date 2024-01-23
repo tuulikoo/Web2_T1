@@ -9,3 +9,8 @@ declare global {
     interface User extends Partial<UserType> {}
   }
 }
+declare module 'express' {
+  interface Request {
+    user?: User;
+  }
+}

@@ -95,11 +95,10 @@ const userPut = async (
   }
 
   try {
-    if (req.user && req.user.role !== 'admin') {
+    const user = req.body;
+    if (user && user.role !== 'admin') {
       throw new CustomError('Admin only', 403);
     }
-
-    const user = req.body;
 
     const result = await updateUser(user, req.params.id);
 
@@ -136,13 +135,14 @@ const userPutCurrent = async (
   }
 };
 const userDelete = async (
-  req: Request<{id: string}, {}, {}>,
+  req: Request<{id: string}, {}, User>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   try {
+    const user = req.body;
     // Ensure the requesting user has admin role
-    if (req.user && req.user.role !== 'admin') {
+    if (user && user.role !== 'admin') {
       console.log('User Controller - Admin only');
       throw new CustomError('Admin only', 403);
     }
@@ -162,12 +162,13 @@ const userDeleteCurrent = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.user?.user_id) {
+    const user = req.body;
+    if (!user?.user_id) {
       throw new CustomError('No user', 400);
       console.log('******************userDeleteCurrent validation' + req.body);
     }
 
-    const result = await deleteUser(req.user.user_id);
+    const result = await deleteUser(user.user_id);
 
     res.json(result);
   } catch (error) {
@@ -177,10 +178,11 @@ const userDeleteCurrent = async (
 };
 
 const checkToken = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
+  const user = req.body;
+  if (!user) {
     next(new CustomError('Token not valid', 403));
   } else {
-    res.json(req.user);
+    res.json(user);
   }
 };
 

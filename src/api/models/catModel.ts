@@ -2,7 +2,7 @@ import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import {Cat} from '../../types/DBTypes';
-import {MessageResponse, UploadResponse} from '../../types/MessageTypes';
+import {MessageResponse} from '../../types/MessageTypes';
 
 const getAllCats = async (): Promise<Cat[]> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
@@ -47,13 +47,18 @@ const getCat = async (catId: number): Promise<Cat> => {
 
   return cat;
 };
+// TODO: create updateCat function to update single cat
+// if role is admin, update any cat
+// if role is user, update only cats owned by user
+// You can use updateUser function from userModel as a reference for SQL
 
 type UpdateCatData = Partial<Omit<Cat, 'cat_id'>> & {owner?: number};
 
 const updateCat = async (
   data: Cat | UpdateCatData,
   catId: number,
-  userRole: 'admin' | 'user' | undefined = undefined
+  user_id: number,
+  userRole: 'admin' | 'user'
 ): Promise<MessageResponse> => {
   const catData: UpdateCatData =
     'owner' in data ? (data as UpdateCatData) : {owner: data.owner};
@@ -63,11 +68,12 @@ const updateCat = async (
   }
 
   let updateSql = 'UPDATE sssf_cat SET ? WHERE cat_id = ?';
-  const updateValues: any[] = [catData, catId];
+  const updateValues: (UpdateCatData | number)[] = [catData, catId];
 
   if (userRole === 'user') {
+    // Ensure the user can only update cats they own
     updateSql += ' AND owner = ?';
-    updateValues.push(catData.owner);
+    updateValues.push(user_id); // Assuming user_id is the ID of the current user
   }
 
   const sql = promisePool.format(updateSql, updateValues);

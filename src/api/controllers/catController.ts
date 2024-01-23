@@ -69,7 +69,7 @@ const catPost = async (
 
   try {
     const {cat_name, weight, owner, birthdate} = req.body;
-    const filename = req.file.filename;
+    const filename = req.file?.filename ?? ''; // Add nullish coalescing operator to provide a default value
     const [lat, lng] = res.locals.coords;
     const result = await addCat({
       cat_name,
@@ -87,7 +87,7 @@ const catPost = async (
 };
 
 const catPut = async (
-  req: Request<{ id: string }, {}, Cat>,
+  req: Request<{id: string}, {}, Cat>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
@@ -105,19 +105,13 @@ const catPut = async (
   try {
     const id = Number(req.params.id);
     const cat = req.body;
-
-    // Check if req.user is defined before accessing its properties
-    const userId = req.user?.user_id;
-    const userRole = req.user?.role;
-
-    // Check if userId and userRole are defined before calling updateCat
-    if (userId !== undefined && userRole !== undefined) {
-      const result = await updateCat(cat, id, userRole);
-      res.json(result);
-    } else {
-      // Handle the case where userId or userRole is undefined
-      throw new CustomError('User not authenticated', 401);
-    }
+    const result = await updateCat(
+      cat,
+      id,
+      (req.user as User).user_id,
+      (req.user as User).role
+    );
+    res.json(result);
   } catch (error) {
     next(error);
   }
