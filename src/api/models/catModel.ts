@@ -51,6 +51,11 @@ const getCat = async (catId: number): Promise<Cat> => {
   return cat;
 };
 
+// TODO: create updateCat function to update single cat
+// if role is admin, update any cat
+// if role is user, update only cats owned by user
+// You can use updateUser function from userModel as a reference for SQL
+
 type UpdateCatData = Partial<Omit<Cat, 'cat_id'>> & {owner?: number};
 
 const updateCat = async (
@@ -62,16 +67,16 @@ const updateCat = async (
   const catData: UpdateCatData =
     'owner' in data ? (data as UpdateCatData) : {owner: data.owner};
 
-  if (userRole === 'user' && catData.owner === undefined) {
+  if (userRole === 'user' && catData.owner !== user_id) {
     throw new CustomError('User role requires "owner" field', 400);
   }
 
   let updateSql = 'UPDATE sssf_cat SET ? WHERE cat_id = ?';
   const updateValues: (UpdateCatData | number)[] = [catData, catId];
 
-  if (userRole === 'user') {
+  if (userRole === 'user' && catData.owner === user_id) {
     // Ensure the user can only update cats they own
-    updateSql += ' AND owner = ?';
+    updateSql += ' AND owner = ?;';
     updateValues.push(user_id);
   }
 
@@ -117,7 +122,7 @@ const addCat = async (data: AddCatData): Promise<MessageResponse> => {
   }
   return {message: 'Cat added'};
 };
-
+//deletCat oli valmiina
 const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `

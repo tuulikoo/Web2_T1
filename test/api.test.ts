@@ -61,11 +61,13 @@ describe('GET /api/v1', () => {
   it('should return array of users', async () => {
     const users: User[] = await getUser(app);
     userId = users[0].user_id!;
+    console.log('userId: ', users[0]);
   });
 
   // test get single user
   it('should return single user', async () => {
     await getSingleUser(app, userId);
+    console.log('****userId: ', userId);
   });
 
   // test update user
