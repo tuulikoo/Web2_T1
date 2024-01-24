@@ -2,7 +2,7 @@ import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import {Cat} from '../../types/DBTypes';
-import {MessageResponse} from '../../types/MessageTypes';
+import {MessageResponse, UploadResponse} from '../../types/MessageTypes';
 
 const getAllCats = async (): Promise<Cat[]> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
@@ -43,12 +43,12 @@ const getCat = async (catId: number): Promise<Cat> => {
   if (rows.length === 0) {
     throw new CustomError('No cat found', 404);
   }
-  const cat = {
-    ...rows[0],
-    owner: JSON.parse(rows[0].owner?.toString() || '{}'),
-  };
+  const cats = (rows as Cat[]).map((row) => ({
+    ...row,
+    owner: JSON.parse(row.owner?.toString() || '{}'),
+  }));
 
-  return cat;
+  return cats[0];
 };
 
 // TODO: create updateCat function to update single cat
@@ -56,36 +56,29 @@ const getCat = async (catId: number): Promise<Cat> => {
 // if role is user, update only cats owned by user
 // You can use updateUser function from userModel as a reference for SQL
 
-type UpdateCatData = Partial<Omit<Cat, 'cat_id'>> & {owner?: number};
+type UpdateCatData = Partial<Omit<Cat, 'cat_id'>>;
 
 const updateCat = async (
-  data: Cat | UpdateCatData,
+  data: UpdateCatData,
   catId: number,
   user_id: number,
   userRole: 'admin' | 'user'
 ): Promise<MessageResponse> => {
-  const catData: UpdateCatData =
-    'owner' in data ? (data as UpdateCatData) : {owner: data.owner};
-
-  if (userRole === 'user' && catData.owner !== user_id) {
-    throw new CustomError('User role requires "owner" field', 400);
+  let sql;
+  if (userRole === 'admin') {
+    sql = promisePool.format('UPDATE sssf_cat SET ? WHERE cat_id = ?;', [
+      data,
+      catId,
+    ]);
+  } else {
+    sql = promisePool.format(
+      'UPDATE sssf_cat SET ? WHERE cat_id = ? AND owner = ?;',
+      [data, catId, user_id]
+    );
   }
-
-  let updateSql = 'UPDATE sssf_cat SET ? WHERE cat_id = ?';
-  const updateValues: (UpdateCatData | number)[] = [catData, catId];
-
-  if (userRole === 'user' && catData.owner === user_id) {
-    // Ensure the user can only update cats they own
-    updateSql += ' AND owner = ?;';
-    updateValues.push(user_id);
-  }
-
-  const sql = promisePool.format(updateSql, updateValues);
-
   const [headers] = await promisePool.execute<ResultSetHeader>(sql);
-
   if (headers.affectedRows === 0) {
-    throw new CustomError('No cats updated', 400);
+    throw new CustomError('Cat not updated', 400);
   }
 
   return {message: 'Cat updated'};
@@ -101,7 +94,7 @@ type AddCatData = {
   lng: number;
 };
 
-const addCat = async (data: AddCatData): Promise<MessageResponse> => {
+const addCat = async (data: AddCatData): Promise<UploadResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
@@ -120,8 +113,9 @@ const addCat = async (data: AddCatData): Promise<MessageResponse> => {
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats added', 400);
   }
-  return {message: 'Cat added'};
+  return {message: 'Cat added', id: headers.insertId};
 };
+
 //deletCat oli valmiina
 const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(

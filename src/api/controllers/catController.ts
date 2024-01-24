@@ -46,7 +46,7 @@ const catGet = async (req: Request, res: Response<Cat>, next: NextFunction) => {
 };
 // TODO: create catPost function to add new cat
 const catPost = async (
-  req: Request<{}, {}, Omit<Cat, 'owner'> & {owner: number; filename: string}>,
+  req: Request<{}, {}, Omit<Cat, 'owner'> & {owner: number}>,
   res: Response<MessageResponse, {coords: [number, number]}>,
   next: NextFunction
 ) => {
@@ -56,7 +56,7 @@ const catPost = async (
   // catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
   // catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
 
-  const errors = validationResult(req);
+  const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
@@ -66,20 +66,32 @@ const catPost = async (
     next(new CustomError(messages, 400));
     return;
   }
-
   try {
-    const {cat_name, weight, owner, birthdate} = req.body;
-    const filename = req.file?.filename ?? ''; // Add nullish coalescing operator to provide a default value
+    if (!req.file) {
+      throw new CustomError('No file', 400);
+      return;
+    }
+    const filename = req.file.filename;
     const [lat, lng] = res.locals.coords;
-    const result = await addCat({
-      cat_name,
-      weight,
-      owner,
+    const {user_id, role} = req.user as User;
+    const cat: Omit<Cat, 'owner'> & {
+      owner: number;
+      filename: string;
+      lat: number;
+      lng: number;
+      user_id: number;
+      role: string;
+    } = {
+      ...req.body,
+      owner: user_id,
       filename,
-      birthdate,
       lat,
       lng,
-    });
+      user_id,
+      role,
+    };
+
+    const result = await addCat(cat);
     res.json(result);
   } catch (error) {
     next(error);
@@ -97,7 +109,7 @@ const catPut = async (
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('cat_post validation', messages);
+    console.log('cat_put validation', messages);
     next(new CustomError(messages, 400));
     return;
   }
@@ -105,11 +117,16 @@ const catPut = async (
   try {
     const id = Number(req.params.id);
     const cat = req.body;
+    if (!req.user || !('user_id' in req.user)) {
+      throw new CustomError('Invalid user data', 400);
+    }
+    console.log(req);
+    const user = req.user;
     const result = await updateCat(
       cat,
       id,
-      (req.user as User).user_id,
-      (req.user as User).role
+      (user as User).user_id,
+      (user as User).role
     );
     res.json(result);
   } catch (error) {

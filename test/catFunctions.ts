@@ -27,6 +27,7 @@ const getCat = (url: string | Function): Promise<Cat[]> => {
 
 const getSingleCat = (url: string | Function, id: number): Promise<Cat> => {
   return new Promise((resolve, reject) => {
+    console.log('************id getSingleCat', id);
     request(url)
       .get('/api/v1/cats/' + id)
       .expect(200, (err, response) => {

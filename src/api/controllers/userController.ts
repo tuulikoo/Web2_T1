@@ -27,14 +27,16 @@ const userListGet = async (
 };
 
 const userGet = async (
-  req: Request<{id: string}, {}, {}>,
+  req: Request<{id: number}, {}, {}>,
   res: Response<User>,
   next: NextFunction
 ) => {
+  console.log('ollaan userGetissa');
   try {
     const id = Number(req.params.id);
     const user = await getUser(id);
     res.json(user);
+    console.log('userGetissa, user: ', user);
   } catch (error) {
     next(error);
   }
@@ -72,7 +74,6 @@ const userPost = async (
     next(new CustomError(messages, 400));
     return;
   }
-
   try {
     const {user_name, email, password} = req.body;
 
@@ -94,7 +95,8 @@ const userPost = async (
     next(error);
   }
 };
-//userPut oli valmiina))
+
+//userPut oli valmiina
 const userPut = async (
   req: Request<{id: number}, {}, User>,
   res: Response<MessageResponse>,
@@ -112,10 +114,12 @@ const userPut = async (
   }
 
   try {
-    const user = req.body;
-    if (user && user.role !== 'admin') {
+    if (req.user && (req.user as User).role !== 'admin') {
       throw new CustomError('Admin only', 403);
     }
+
+    const user = req.body;
+
     const result = await updateUser(user, req.params.id);
 
     res.json(result);
@@ -125,10 +129,12 @@ const userPut = async (
 };
 
 const userPutCurrent = async (
-  req: Request<{id: number}, {}, User>,
+  req: Request<{}, {}, User>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
+  console.log('ollaan userPutCurrentissa');
+  console.log('req', req);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -139,32 +145,40 @@ const userPutCurrent = async (
     next(new CustomError(messages, 400));
     return;
   }
-
   try {
-    const user = req.body;
-
-    const result = await updateUser(user, req.params.id);
+    const user = req.user;
+    console.log('******user', user);
+    if (!(user as User)?.user_id) throw new Error('No userId');
+    const result = await updateUser(req.body, (user as User).user_id);
 
     res.json(result);
   } catch (error) {
     next(error);
   }
 };
+
 const userDelete = async (
-  req: Request<{id: string}, {}, User>,
+  req: Request<{id: number}, {}, {}>,
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('userDelete validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
+
   try {
-    const user = req.body;
     // Ensure the requesting user has admin role
-    if (user && user.role !== 'admin') {
-      console.log('User Controller - Admin only');
+    if ((req.user as User) && (req.user as User).role !== 'admin') {
       throw new CustomError('Admin only', 403);
     }
-
-    const id = Number(req.params.id);
-    const result = await deleteUser(id);
+    const result = await deleteUser(req.params.id);
 
     res.json(result);
   } catch (error) {
@@ -177,28 +191,35 @@ const userDeleteCurrent = async (
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  try {
-    const user = req.body;
-    if (!user?.user_id) {
-      throw new CustomError('No user', 400);
-      console.log('******************userDeleteCurrent validation' + req.body);
-    }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const messages: string = errors
+      .array()
+      .map((error) => `${error.msg}: ${error.param}`)
+      .join(', ');
+    console.log('cat_post validation', messages);
+    next(new CustomError(messages, 400));
+    return;
+  }
 
-    const result = await deleteUser(user.user_id);
+  try {
+    // Ensure req.user is of type User
+    if (!req.user || !('user_id' in req.user)) {
+      throw new CustomError('No user', 400);
+    }
+    const result = await deleteUser(Number(req.user.user_id));
 
     res.json(result);
   } catch (error) {
     next(error);
-    console.log('******************userDeleteCurrent validation' + req.body);
   }
 };
 
 const checkToken = (req: Request, res: Response, next: NextFunction) => {
-  const user = req.body;
-  if (!user) {
-    next(new CustomError('Token not valid', 403));
+  if (!req.user) {
+    next(new CustomError('token not valid', 403));
   } else {
-    res.json(user);
+    res.json(req.user);
   }
 };
 
@@ -209,6 +230,6 @@ export {
   userPut,
   userPutCurrent,
   userDelete,
-  checkToken,
   userDeleteCurrent,
+  checkToken,
 };

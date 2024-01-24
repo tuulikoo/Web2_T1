@@ -16,7 +16,7 @@ const getAllUsers = async (): Promise<User[]> => {
   }
   return rows;
 };
-
+//oli valmiina
 const getUser = async (userId: number): Promise<User> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & User[]>(
     `
@@ -29,9 +29,12 @@ const getUser = async (userId: number): Promise<User> => {
   if (rows.length === 0) {
     throw new CustomError('No users found', 404);
   }
+  console.log('getUserissa');
+  console.log('rows[0]', rows[0]);
   return rows[0];
 };
 
+// TODO: create addUser function
 const addUser = async (user: User): Promise<MessageResponse> => {
   const sql = promisePool.format('INSERT INTO sssf_user SET ?', user);
   const [headers] = await promisePool.execute<ResultSetHeader>(sql);
@@ -40,7 +43,7 @@ const addUser = async (user: User): Promise<MessageResponse> => {
   }
   return {message: 'User added'};
 };
-// TODO: create addUser function
+//oli valmiina
 const updateUser = async (
   data: Partial<User>,
   userId: number
@@ -49,12 +52,14 @@ const updateUser = async (
     data,
     userId,
   ]);
+  console.log('sql', sql);
   const [headers] = await promisePool.execute<ResultSetHeader>(sql);
   if (headers.affectedRows === 0) {
     throw new CustomError('No users updated', 400);
   }
   return {message: 'User updated'};
 };
+
 // TODO: create deleteUser function
 
 const deleteUser = async (userId: number): Promise<MessageResponse> => {

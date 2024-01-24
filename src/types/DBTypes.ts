@@ -17,7 +17,7 @@ type Cat = {
   weight: number;
   owner: User | number; // owner should be a User or a number
   filename: string;
-  birthdate: string | null; // Assuming birthdate can be null as per the database schema
+  birthdate: string; // Assuming birthdate can be null as per the database schema
   coords: Point;
 };
 
