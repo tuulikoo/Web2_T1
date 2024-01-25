@@ -17,7 +17,12 @@ const router = express.Router();
 router
   .route('/')
   .get(userListGet)
-  .post(userPost)
+  .post(
+    body('user_name').isLength({min: 3}).isString(),
+    body('email').isEmail(),
+    body('password').isLength({min: 5}).isString(),
+    userPost
+  )
   .put(passport.authenticate('jwt', {session: false}), userPutCurrent)
   .delete(passport.authenticate('jwt', {session: false}), userDeleteCurrent);
 
@@ -34,7 +39,6 @@ router
   .delete(passport.authenticate('jwt', {session: false}), userDelete);
 
 export default router;
-
 
 // - user_name should be at least 3 characters long
 // - email should be a valid email
