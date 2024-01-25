@@ -34,3 +34,9 @@ router
   .delete(passport.authenticate('jwt', {session: false}), userDelete);
 
 export default router;
+
+
+// - user_name should be at least 3 characters long
+// - email should be a valid email
+// - password should be at least 5 characters long
+// userPost should use bcrypt to hash password

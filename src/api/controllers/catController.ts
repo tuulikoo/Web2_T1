@@ -50,30 +50,24 @@ const catPost = async (
   res: Response<MessageResponse, {coords: [number, number]}>,
   next: NextFunction
 ) => {
-  // catPost should use addCat function from catModel
-  // catPost should use validationResult to validate req.body
-  // catPost should use req.file to get filename
-  // catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
-  // catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
-
   const errors = validationResult(req.body);
+
   if (!errors.isEmpty()) {
     const messages: string = errors
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
+
     console.log('cat_post validation', messages);
     next(new CustomError(messages, 400));
     return;
   }
+
   try {
-    if (!req.file) {
-      throw new CustomError('No file', 400);
-      return;
-    }
-    const filename = req.file.filename;
+    const {filename} = req.file || {};
     const [lat, lng] = res.locals.coords;
     const {user_id, role} = req.user as User;
+
     const cat: Omit<Cat, 'owner'> & {
       owner: number;
       filename: string;
@@ -84,7 +78,7 @@ const catPost = async (
     } = {
       ...req.body,
       owner: user_id,
-      filename,
+      filename: filename || '',
       lat,
       lng,
       user_id,
@@ -120,7 +114,7 @@ const catPut = async (
     if (!req.user || !('user_id' in req.user)) {
       throw new CustomError('Invalid user data', 400);
     }
-    console.log(req);
+    //console.log(req);
     const user = req.user;
     const result = await updateCat(
       cat,
@@ -149,7 +143,7 @@ const catDelete = async (
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('cat_post validation', messages);
+    console.log('cat_delete validation', messages);
     next(new CustomError(messages, 400));
     return;
   }

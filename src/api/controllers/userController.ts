@@ -31,12 +31,10 @@ const userGet = async (
   res: Response<User>,
   next: NextFunction
 ) => {
-  console.log('ollaan userGetissa');
   try {
     const id = Number(req.params.id);
     const user = await getUser(id);
     res.json(user);
-    console.log('userGetissa, user: ', user);
   } catch (error) {
     next(error);
   }
@@ -108,7 +106,7 @@ const userPut = async (
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('cat_post validation', messages);
+    console.log('user_put validation', messages);
     next(new CustomError(messages, 400));
     return;
   }
@@ -133,8 +131,6 @@ const userPutCurrent = async (
   res: Response<MessageResponse>,
   next: NextFunction
 ) => {
-  console.log('ollaan userPutCurrentissa');
-  console.log('req', req);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const messages: string = errors
@@ -147,7 +143,6 @@ const userPutCurrent = async (
   }
   try {
     const user = req.user;
-    console.log('******user', user);
     if (!(user as User)?.user_id) throw new Error('No userId');
     const result = await updateUser(req.body, (user as User).user_id);
 
@@ -197,7 +192,7 @@ const userDeleteCurrent = async (
       .array()
       .map((error) => `${error.msg}: ${error.param}`)
       .join(', ');
-    console.log('cat_post validation', messages);
+    console.log('userDeleteCurrent validation', messages);
     next(new CustomError(messages, 400));
     return;
   }

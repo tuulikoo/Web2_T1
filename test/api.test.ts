@@ -54,7 +54,6 @@ describe('GET /api/v1', () => {
       password: 'asdfQEWR1234',
     });
     token = user.token;
-    console.log('token: ', token);
   });
 
   // test get all users
@@ -62,13 +61,11 @@ describe('GET /api/v1', () => {
   it('should return array of users', async () => {
     const users: User[] = await getUser(app);
     userId = users[0].user_id!;
-    console.log('userId: ', users[0]);
   });
 
   // test get single user
   it('should return single user', async () => {
     await getSingleUser(app, userId);
-    console.log('****userId: ', userId);
   });
 
   // test update user
@@ -87,7 +84,6 @@ describe('GET /api/v1', () => {
   let catID = 0;
   it('should upload a cat', async () => {
     const message = await postCat(app, token, owner, 'cat.jpg');
-    console.log('message: ', message);
     catID = message.id!;
   });
 
@@ -104,7 +100,6 @@ describe('GET /api/v1', () => {
   });
 
   // test get single cat
-
   it('should return single cat', async () => {
     await getSingleCat(app, catID);
   });
