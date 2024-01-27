@@ -100,5 +100,4 @@ INSERT INTO `sssf_user` (`user_id`, `user_name`, `email`, `password`, `role`) VA
 (37, 'Test User', 'john@metropolia.fi', '$2a$10$5RzpyimIeuzNqW7G8seBiOzBiWBvrSWroDomxMa0HzU6K2ddSgixS', 'user');
 ```
 ## All tests passed
-![Image of test score]
-(<Screenshot 2024-01-25 at 9.29.29.png>)
+![Image of test score](Screenshot%202024-01-25%20at%209.29.29.png)
